@@ -1,3 +1,4 @@
+
 /**
  * nb-mcp — a remote MCP server on Cloudflare Workers for image generation.
  *
@@ -231,6 +232,15 @@ export default {
     }
 
     if (url.pathname === "/mcp") {
+      const expectedToken = (env as Env & { NB_AUTH_TOKEN?: string }).NB_AUTH_TOKEN;
+const providedToken = request.headers.get("Authorization");
+
+if (!expectedToken || providedToken !== `Bearer ${expectedToken}`) {
+  return new Response("Unauthorized", {
+    status: 401,
+    headers: CORS,
+  });
+}
       if (request.method === "DELETE") {
         return new Response(null, { status: 204, headers: CORS }); // stateless: nothing to clean up
       }
